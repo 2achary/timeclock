@@ -19,6 +19,7 @@ class ClockIn(object):
         if 'is-clocked-in' not in shelf:
             shelf['is-clocked-in'] = False
         is_clocked_in = shelf['is-clocked-in']
+
         if not is_clocked_in:
             time_stamp = datetime.datetime.now()
             key_name = time_stamp.isoformat()
@@ -28,9 +29,9 @@ class ClockIn(object):
             shelf[key_name] = entry
             shelf['most_recent'] = key_name
             shelf.close()
-            return "\n**Clocked in at : {}**".format(time_stamp.strftime(self.__time_format))
+            return "\nClocked in at : {}".format(time_stamp.strftime(self.__time_format))
         else:
-            return "**Already clocked in**"
+            return "Already clocked in"
 
     def punch_out(self):
 
@@ -38,6 +39,7 @@ class ClockIn(object):
         if 'is-clocked-in' not in shelf:
             shelf['is-clocked-in'] = False
         is_clocked_in = shelf['is-clocked-in']
+
         if is_clocked_in:
             shelf['is-clocked-in'] = False
             time_stamp = datetime.datetime.now()
@@ -52,21 +54,20 @@ class ClockIn(object):
             durations = shelf['durations']
             durations.append(duration.total_seconds())
             shelf['durations'] = durations
-            shelf.close()
-            return "\n**Clocked out at: {}**\n".format(time_stamp.strftime(self.__time_format))
+            # shelf.close()
+            return "\nClocked out at: {}\n".format(time_stamp.strftime(self.__time_format))
         else:
-            return "\n**Not clocked in**\n"
-
+            return "\nNot clocked in\n"
 
     def total_time_today(self):
         shelf = shelve.open(self.__shelf_name)
         if 'durations' not in shelf:
                 shelf['durations'] = []
         sum_of_durs = sum(shelf['durations'])
+        shelf.close()
         minutes = sum_of_durs/60
         hours = minutes/60
         return "{} hours".format(round(hours, 2))
-        shelf.close()
 
     def change_day(self, time_delta):
         td = datetime.timedelta(days=time_delta)
@@ -76,6 +77,7 @@ class ClockIn(object):
         shelf = shelve.open(self.__shelf_name)
         shelf_list = []
         shelf_objects = []
+
         for entry in shelf:
             if entry == 'most_recent' or entry == 'durations' or entry == 'is-clocked-in':
                 continue
@@ -83,35 +85,35 @@ class ClockIn(object):
 
         for entry in shelf_objects:
             readable = {}
-
             readable['in'] = entry['in'].strftime(self.__time_format)
 
             if entry['out']:
                 readable['out'] = entry['out'].strftime(self.__time_format)
 
             shelf_list.append(readable)
-        # print shelf_list
         return json.dumps(shelf_list)
 
     def select_day_shelf(self, day_to_select):
         today_number = int(datetime.datetime.today().isoweekday())
         todays_date = datetime.datetime.today()
+
         if day_to_select < today_number:
             difference = today_number - day_to_select
             td = datetime.timedelta(days=difference)
             edit_date = (todays_date - td).date().isoformat()
             edit_shelf_name = '{}_timesheet.shelf'.format(edit_date)
-            print edit_shelf_name
+
             if path.isfile(edit_shelf_name + ".db"):
                 return edit_shelf_name
             else:
                 return
+
         elif day_to_select > today_number:
             difference = day_to_select - today_number
             td = datetime.timedelta(days=difference)
             edit_date = (todays_date + td).date().isoformat()
             edit_shelf_name = '{}_timesheet.shelf'.format(edit_date)
-            print edit_shelf_name
+
             if path.isfile(edit_shelf_name + ".db"):
                 return edit_shelf_name
             else:
