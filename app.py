@@ -29,7 +29,17 @@ def total_time_today():
     clock = ClockIn()
     return clock.total_time_today()
 
+@app.route("/total_time_this_week")
+def total_time_this_week():
+    clock = ClockIn()
+    return clock.total_time_this_week()
+
 
 if __name__ == "__main__":
     app.run()
     # pass
+    # import time
+    # c = ClockIn()
+    # c.punch_in()
+    # time.sleep(3)
+    # c.punch_out()
