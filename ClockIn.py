@@ -15,7 +15,11 @@ class ClockIn(object):
     __shelf_name = '{}_timesheet.shelf'.format(__todays_date)
     __edit_shelf_name = '{}_timesheet.shelf'.format(__edit_date)
 
+    def _get_today(self):
+        self.__todays_date = datetime.datetime.today().date().isoformat()
+
     def punch_in(self):
+        self._get_today()
         shelf = shelve.open(self.__shelf_name)
         if 'is-clocked-in' not in shelf:
             shelf['is-clocked-in'] = False
@@ -35,7 +39,7 @@ class ClockIn(object):
             return "Already clocked in"
 
     def punch_out(self):
-
+        self._get_today()
         shelf = shelve.open(self.__shelf_name)
         if 'is-clocked-in' not in shelf:
             shelf['is-clocked-in'] = False
@@ -61,6 +65,7 @@ class ClockIn(object):
             return "\nNot clocked in\n"
 
     def total_time_today(self):
+        self._get_today()
         shelf = shelve.open(self.__shelf_name)
         if 'durations' not in shelf:
                 shelf['durations'] = []
@@ -71,32 +76,44 @@ class ClockIn(object):
         return "{} hours".format(round(hours, 2))
 
     def total_time_this_week(self):
+
+        #get today's iso number
         today = datetime.datetime.today()
         today_iso = datetime.datetime.today().isoweekday()
+
+        #store monday reference
         td = datetime.timedelta(days=today_iso - 1)
         weekday = today - td
-        print(weekday.isoweekday())
+
+        #start the while loop to add the times
         counter = 0
         sum_of_durs = 0
         shelf = None
         while counter <= 7:
-            td = datetime.timedelta(days=1)
-            weekday = weekday + td
+
             # #printweekday.isoweekday()
             fn = "{}_timesheet.shelf.db".format(weekday.date().isoformat())
-
+            print(fn)
             if path.isfile(fn):
+
                 # #print"it's a file"
-                shelf = shelve.open(fn)
+                shelf = shelve.open(fn[:-3], protocol=2)
 
                 if 'durations' in shelf:
                     durs = shelf['durations']
-                    durs = sum(durs)
-                    sum_of_durs += durs
+                    day_durs_sum = sum(durs)
+                    sum_of_durs += day_durs_sum
+
+                shelf.close()
+
+            #increment the timedelta
             counter += 1
-        if shelf:
-            shelf.close()
-        return sum_of_durs
+            td = datetime.timedelta(days=1)
+            weekday = weekday + td
+
+        minutes = sum_of_durs/60
+        hours = minutes/60
+        return "{} hours this week".format(round(hours, 2))
 
     def change_day(self, time_delta):
         td = datetime.timedelta(days=time_delta)
@@ -228,4 +245,5 @@ if __name__ == "__main__":
     c.punch_in()
     time.sleep(3)
     c.punch_out()
+    time.sleep(3)
     print(c.total_time_this_week())

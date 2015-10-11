@@ -38,6 +38,19 @@ $( "#clockout" ).bind( "click", function() {
   request.send();
 });
 
+$( "#total-time-this-week" ).bind( "click", function() {
+  var request = new XMLHttpRequest();
+  request.onreadystatechange = function () {
+
+    if(request.readyState === 4 && request.status === 200) {
+      var alertMessage = request.responseText;
+      document.getElementById("feedback").innerHTML = alertMessage;
+    }
+  };
+  request.open('GET', 'http://localhost:5000/total_time_this_week');
+  request.send();
+});
+
 $( "#list-entries" ).bind( "click", function() {
   var request = new XMLHttpRequest();
   request.onreadystatechange = function () {
