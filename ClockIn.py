@@ -77,6 +77,18 @@ class ClockIn(object):
 
     def total_time_this_week(self):
 
+        summary = {}
+
+        iso_day_lookup = {
+            1: "Monday",
+            2: "Tuesday",
+            3: "Wednesday",
+            4: "Thursday",
+            5: "Friday",
+            6: "Saturday",
+            7: "Sunday"
+        }
+
         #get today's iso number
         today = datetime.datetime.today()
         today_iso = datetime.datetime.today().isoweekday()
@@ -102,7 +114,11 @@ class ClockIn(object):
                 if 'durations' in shelf:
                     durs = shelf['durations']
                     day_durs_sum = sum(durs)
+                    summary[iso_day_lookup[
+                        weekday.isoweekday()
+                    ]] = self._get_hours(day_durs_sum)
                     sum_of_durs += day_durs_sum
+
 
                 shelf.close()
 
@@ -111,9 +127,12 @@ class ClockIn(object):
             td = datetime.timedelta(days=1)
             weekday = weekday + td
 
-        minutes = sum_of_durs/60
-        hours = minutes/60
-        return "{} hours this week".format(round(hours, 2))
+        summary['message'] = "{} hours this week".format(
+            round(self._get_hours(sum_of_durs), 2))
+        return json.dumps(summary)
+
+    def _get_hours(self, seconds):
+        return (seconds / 60) / 60
 
     def change_day(self, time_delta):
         td = datetime.timedelta(days=time_delta)
