@@ -118,9 +118,7 @@ class ClockIn(object):
             print(fn)
             if path.isfile(fn):
 
-                # #print"it's a file"
                 shelf_name = fn[:-3]
-
                 day_durs_sum = self._sum_of_durs(shelf_name)
 
                 summary[iso_day_lookup[
@@ -192,7 +190,8 @@ class ClockIn(object):
             else:
                 return
         else:
-            edit_shelf_name = '{}_timesheet.shelf'.format(todays_date.date().isoformat())
+            edit_shelf_name = '{}_timesheet.shelf'.format(
+                todays_date.date().isoformat())
             if path.isfile(edit_shelf_name + ".db"):
                 return edit_shelf_name
             else:
@@ -201,7 +200,8 @@ class ClockIn(object):
     def list_entry_keys(self, shelf_name):
         shelf = shelve.open(shelf_name)
         for entry in shelf:
-            if entry == 'most_recent' or entry == 'durations' or entry == 'is-clocked-in':
+            if entry == 'most_recent' or entry == 'durations' or (
+                        entry == 'is-clocked-in'):
                 continue
             #printentry
         shelf.close()
@@ -209,7 +209,8 @@ class ClockIn(object):
     def make_edit(self, shelf_name, key_to_edit, in_or_out, update_string):
         shelf = shelve.open(shelf_name)
         entry = shelf[key_to_edit]
-        update_datetime = datetime.datetime.strptime(update_string, self.__datetime_format)
+        update_datetime = datetime.datetime.strptime(
+            update_string, self.__datetime_format)
         entry[in_or_out] = update_datetime
         shelf[key_to_edit] = entry
         shelf.close()

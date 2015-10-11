@@ -124,5 +124,12 @@ $( "#edit" ).bind( "click", function() {
 });
 
 $('#date-picker').change(function(){
-    console.log($('#date-picker').val());
+    date_string = $('#date-picker').val();
+    $.ajax({
+        url:'http://localhost:5000/select_day',
+        data: {day:date_string},
+        method: "POST"
+    }).done(function(data){
+        $("#edit-area").append(data)
+    });
 });
