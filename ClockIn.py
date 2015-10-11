@@ -61,28 +61,28 @@ class ClockIn(object):
 
     def total_time_today(self):
         self._get_today()
-        shelf = shelve.open(self.__shelf_name)
-        duration = self._sum_of_durs(shelf)
+        duration = self._sum_of_durs(self.__shelf_name)
         return "{} hours".format(duration)
 
     def _sum_of_durs(self, shelf_name):
         durations = []
-
-        for entry in shelf_name:
+        shelf = shelve.open(shelf_name)
+        for entry in shelf:
             if entry == 'most_recent' or entry == 'durations' or (
                         entry == 'is-clocked-in'):
                 continue
             else:
-                start = entry['in']
-                if entry['out']:
-                    finish = entry['out']
+                record = shelf[entry]
+                start = record['in']
+                if record['out']:
+                    finish = record['out']
                 else:
                     finish = datetime.datetime.now()
                 duration = finish - start
                 durations.append(duration.total_seconds())
 
         sum_of_durs = sum(durations)
-        shelf_name.close()
+        shelf.close()
         return round(self._get_hours(sum_of_durs), 2)
 
     def total_time_this_week(self):
@@ -126,7 +126,6 @@ class ClockIn(object):
                 ]] = day_durs_sum
 
                 sum_of_durs += day_durs_sum
-                shelf.close()
 
             #increment the timedelta
             counter += 1
@@ -274,4 +273,4 @@ if __name__ == "__main__":
     time.sleep(3)
     c.punch_out()
     time.sleep(3)
-    print(c.total_time_this_week())
+    print(c.total_time_today())

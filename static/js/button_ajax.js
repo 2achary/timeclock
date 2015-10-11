@@ -45,6 +45,7 @@ $("#total-time-this-week").bind( "click", function() {
         if(request.readyState === 4 && request.status === 200) {
             var res = JSON.parse(request.responseText);
             $('#table').show();
+            $('#edit-area').hide();
             myTable = document.getElementById("table");
             var entryRows = "<tr><th>Day</th><th>Hours</th></tr>";
 
@@ -88,6 +89,7 @@ $( "#list-entries" ).bind( "click", function() {
         if(request.readyState === 4 && request.status === 200) {
             var res = JSON.parse(request.responseText);
             $('#table').show();
+            $('#edit-area').hide();
             myTable = document.getElementById("table");
 
             var entryRows = "<tr><th>in</th><th>out</th></tr>";
@@ -117,6 +119,7 @@ $( "#edit" ).bind( "click", function() {
         if(request.readyState === 4 && request.status === 200) {
             var res = JSON.parse(request.responseText);
             $('#table').hide();
+            $('#edit-area').show();
         }
     };
   request.open('GET', 'http://localhost:5000/list_entries');
