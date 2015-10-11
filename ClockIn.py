@@ -29,18 +29,19 @@ class ClockIn(object):
             time_stamp = datetime.datetime.now()
             key_name = time_stamp.isoformat()
             shelf['is-clocked-in'] = True
-            entry = {"in": None, "out": None}
-            entry['in'] = time_stamp
+            entry = {"in": time_stamp, "out": None}
             shelf[key_name] = entry
             shelf['most_recent'] = key_name
             shelf.close()
-            return "\nClocked in at {}".format(time_stamp.strftime(self.__time_format))
+            return "\nClocked in at {}".format(time_stamp.strftime(
+                self.__time_format))
         else:
             return "Already clocked in"
 
     def punch_out(self):
         self._get_today()
         shelf = shelve.open(self.__shelf_name)
+
         if 'is-clocked-in' not in shelf:
             shelf['is-clocked-in'] = False
         is_clocked_in = shelf['is-clocked-in']
@@ -51,29 +52,38 @@ class ClockIn(object):
             entry = shelf[shelf['most_recent']]
             entry['out'] = time_stamp
             shelf[shelf['most_recent']] = entry
-            start = entry['in']
-            finish = entry['out']
-            duration = finish - start
-            if 'durations' not in shelf:
-                shelf['durations'] = []
-            durations = shelf['durations']
-            durations.append(duration.total_seconds())
-            shelf['durations'] = durations
-            # shelf.close()
-            return "\nClocked out at {}\n".format(time_stamp.strftime(self.__time_format))
+            shelf.close()
+
+            return "\nClocked out at {}\n".format(time_stamp.strftime(
+                self.__time_format))
         else:
             return "\nNot clocked in\n"
 
     def total_time_today(self):
         self._get_today()
         shelf = shelve.open(self.__shelf_name)
-        if 'durations' not in shelf:
-                shelf['durations'] = []
-        sum_of_durs = sum(shelf['durations'])
-        shelf.close()
-        minutes = sum_of_durs/60
-        hours = minutes/60
-        return "{} hours".format(round(hours, 2))
+        duration = self._sum_of_durs(shelf)
+        return "{} hours".format(duration)
+
+    def _sum_of_durs(self, shelf_name):
+        durations = []
+
+        for entry in shelf_name:
+            if entry == 'most_recent' or entry == 'durations' or (
+                        entry == 'is-clocked-in'):
+                continue
+            else:
+                start = entry['in']
+                if entry['out']:
+                    finish = entry['out']
+                else:
+                    finish = datetime.datetime.now()
+                duration = finish - start
+                durations.append(duration.total_seconds())
+
+        sum_of_durs = sum(durations)
+        shelf_name.close()
+        return round(self._get_hours(sum_of_durs), 2)
 
     def total_time_this_week(self):
 
@@ -109,17 +119,15 @@ class ClockIn(object):
             if path.isfile(fn):
 
                 # #print"it's a file"
-                shelf = shelve.open(fn[:-3], protocol=2)
+                shelf_name = fn[:-3]
 
-                if 'durations' in shelf:
-                    durs = shelf['durations']
-                    day_durs_sum = sum(durs)
-                    summary[iso_day_lookup[
-                        weekday.isoweekday()
-                    ]] = self._get_hours(day_durs_sum)
-                    sum_of_durs += day_durs_sum
+                day_durs_sum = self._sum_of_durs(shelf_name)
 
+                summary[iso_day_lookup[
+                    weekday.isoweekday()
+                ]] = day_durs_sum
 
+                sum_of_durs += day_durs_sum
                 shelf.close()
 
             #increment the timedelta
@@ -144,13 +152,13 @@ class ClockIn(object):
         shelf_objects = []
 
         for entry in shelf:
-            if entry == 'most_recent' or entry == 'durations' or entry == 'is-clocked-in':
+            if entry == 'most_recent' or entry == 'durations' or (
+                    entry == 'is-clocked-in'):
                 continue
             shelf_objects.append(shelf[entry])
 
         for entry in shelf_objects:
-            readable = {}
-            readable['in'] = entry['in'].strftime(self.__time_format)
+            readable = {'in': entry['in'].strftime(self.__time_format)}
 
             if entry['out']:
                 readable['out'] = entry['out'].strftime(self.__time_format)
