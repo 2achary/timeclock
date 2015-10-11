@@ -132,7 +132,7 @@ class ClockIn(object):
         return json.dumps(summary)
 
     def _get_hours(self, seconds):
-        return (seconds / 60) / 60
+        return round((seconds / 60) / 60, 2)
 
     def change_day(self, time_delta):
         td = datetime.timedelta(days=time_delta)

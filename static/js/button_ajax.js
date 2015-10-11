@@ -1,43 +1,41 @@
 $( "#total-time-today" ).bind( "click", function() {
-  var request = new XMLHttpRequest();
-  request.onreadystatechange = function () {
+    var request = new XMLHttpRequest();
+    request.onreadystatechange = function () {
 
-    if(request.readyState === 4 && request.status === 200) {
-      var res = request.responseText;
-      document.getElementById( "feedback" ).innerHTML = res;
-    }
-  };
-  request.open('GET', 'http://localhost:5000/total_time_today');
-  request.send();
+        if(request.readyState === 4 && request.status === 200) {
+            var res = request.responseText;
+            document.getElementById( "feedback" ).innerHTML = res;
+        }
+    };
+    request.open('GET', 'http://localhost:5000/total_time_today');
+    request.send();
 });
 
-
 $( "#clockin" ).bind( "click", function() {
-  var request = new XMLHttpRequest();
-  request.onreadystatechange = function () {
+    var request = new XMLHttpRequest();
+    request.onreadystatechange = function () {
 
-    if(request.readyState === 4 && request.status === 200) {
-      var alertMessage = request.responseText;
-      document.getElementById("feedback").innerHTML = alertMessage;
-    }
-  };
-  request.open('GET', 'http://localhost:5000/in');
-  request.send();
+        if(request.readyState === 4 && request.status === 200) {
+            var alertMessage = request.responseText;
+            document.getElementById("feedback").innerHTML = alertMessage;
+        }
+    };
+    request.open('GET', 'http://localhost:5000/in');
+    request.send();
 });
 
 $( "#clockout" ).bind( "click", function() {
-  var request = new XMLHttpRequest();
-  request.onreadystatechange = function () {
+    var request = new XMLHttpRequest();
+    request.onreadystatechange = function () {
 
-    if(request.readyState === 4 && request.status === 200) {
-      var alertMessage = request.responseText;
-      document.getElementById("feedback").innerHTML = alertMessage;
-    }
-  };
-  request.open('GET', 'http://localhost:5000/out');
-  request.send();
+        if(request.readyState === 4 && request.status === 200) {
+            var alertMessage = request.responseText;
+            document.getElementById("feedback").innerHTML = alertMessage;
+        }
+    };
+    request.open('GET', 'http://localhost:5000/out');
+    request.send();
 });
-
 
 $("#total-time-this-week").bind( "click", function() {
     var request = new XMLHttpRequest();
@@ -47,6 +45,7 @@ $("#total-time-this-week").bind( "click", function() {
             var res = JSON.parse(request.responseText);
             myTable = document.getElementById("table");
             var entryRows = "<tr><th>Day</th><th>Hours</th></tr>";
+
             var weekdayList = [
                 'Monday',
                 'Tuesday',
@@ -56,25 +55,24 @@ $("#total-time-this-week").bind( "click", function() {
                 'Saturday',
                 'Sunday'
             ];
-            for (var i=0; i<=weekdayList.length; i++) {
 
-                for (var weekday in res){
-                    var row = "<tr>" ;
+            for (var i=0; i<weekdayList.length; i++) {
 
-                    if (weekday === "message") {
-                        continue;
-                    } else if (weekdayList[i] in res) {
-                        row += "<td>" + weekdayList[i] + "</td>";
-                        row += "<td>" + res.weekdayList[i] + "</td>";
-                    } else {
-                        row += "<td>" + weekdayList[i] + "</td>";
-                        row += "<td>0</td>";
-                    }
-                    row += "</tr>";
-                    entryRows += row;
+                var row = "<tr>" ;
+
+                if (weekdayList[i] in res) {
+                    row += "<td>" + weekdayList[i] + "</td>";
+                    row += "<td>" + res[weekdayList[i]] + "</td>";
+                } else {
+                    row += "<td>" + weekdayList[i] + "</td>";
+                    row += "<td>0</td>";
                 }
+                row += "</tr>";
+                entryRows += row;
+
             }
-            myTable.innerHTML = entryRows
+            $("#feedback").html(res.message);
+            myTable.innerHTML = entryRows;
         }
     };
   request.open('GET', 'http://localhost:5000/total_time_this_week');
