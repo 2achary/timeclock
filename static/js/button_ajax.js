@@ -1,4 +1,4 @@
-var url_host = '2achary.pythonanywhere.com/';
+var url_host = '';
 var data_type_json = 'json';
 
 $( "#total-time-today" ).on("click", function() {
