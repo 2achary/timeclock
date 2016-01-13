@@ -132,8 +132,7 @@ class ClockIn(object):
             td = datetime.timedelta(days=1)
             weekday = weekday + td
 
-        summary['message'] = "{} hours this week".format(
-            round(self._get_hours(sum_of_durs), 2))
+        summary['message'] = "{} hours this week".format(sum_of_durs)
         return json.dumps(summary)
 
     def _get_hours(self, seconds):
@@ -161,7 +160,7 @@ class ClockIn(object):
                 readable['out'] = entry['out'].strftime(self.__time_format)
 
             shelf_list.append(readable)
-        return json.dumps(shelf_list)
+        return json.dumps(sorted(shelf_list, key=lambda dct: dct['in']))
 
     def select_day_shelf(self, day_to_select):
         today_number = int(datetime.datetime.today().isoweekday())
@@ -273,4 +272,4 @@ if __name__ == "__main__":
     time.sleep(3)
     c.punch_out()
     time.sleep(3)
-    print(c.total_time_today())
+    print(c.total_time_this_week())

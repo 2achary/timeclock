@@ -46,7 +46,7 @@ def select_day():
 
 
 if __name__ == "__main__":
-    app.run()
+    app.run(debug=True)
     # pass
     # import time
     # c = ClockIn()
