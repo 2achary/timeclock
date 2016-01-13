@@ -1,97 +1,50 @@
-$( "#total-time-today" ).bind( "click", function() {
-    var request = new XMLHttpRequest();
-    request.onreadystatechange = function () {
+var url_host = '2achary.pythonanywhere.com/';
+var data_type_json = 'json';
 
-        if(request.readyState === 4 && request.status === 200) {
-            var res = request.responseText;
-            $('#table').hide();
-            document.getElementById( "feedback" ).innerHTML = res;
-        }
-    };
-    request.open('GET', 'http://localhost:5000/total_time_today');
-    request.send();
-});
-
-// $( "#clockin" ).bind( "click", function() {
-//     var request = new XMLHttpRequest();
-//     request.onreadystatechange = function () {
-
-//         if(request.readyState === 4 && request.status === 200) {
-//             var alertMessage = request.responseText;
-//             document.getElementById("feedback").innerHTML = alertMessage;
-//         }
-//     };
-//     request.open('GET', 'http://2achary.pythonanywhere.com/in');
-//     request.send();
-// });
-
-
-$("#clockin").on("click", function(e) {
-   e.preventDefault();
-
-   $.ajax({
-        type: 'GET',
-        url: 'http://2achary.pythonanywhere.com/in',
-        dataType: "json",
+$( "#total-time-today" ).on("click", function() {
+    $.ajax({
+        url: url_host + 'total_time_today',
+        dataType: data_type_json,
         success: function(data) {
-            console.log(data.msg);
-
+            $("#table").hide();
+            $("#feedback").html(data.msg);
         },
-        error: function(data) {
-            console.log("There was an error");
-
-        },
-        done: function(data) {
-            console.log("All done!")
-        }
     });
 });
 
 
-$("#clockout").on("click", function(e) {
-   e.preventDefault();
-
+$("#clockin").on("click", function() {
    $.ajax({
-        type: 'GET',
-        url: 'http://2achary.pythonanywhere.com/out',
-        dataType: "json",
+        url: url_host + 'in',
+        dataType: data_type_json,
         success: function(data) {
-            console.log(data.msg);
-
+            $("#feedback").html(data.msg);
         },
-        error: function(data) {
-            console.log("There was an error");
-
-        },
-        done: function(data) {
-            console.log("All done!")
-        }
     });
 });
 
 
-// $( "#clockout" ).bind( "click", function() {
-//     var request = new XMLHttpRequest();
-//     request.onreadystatechange = function () {
+$("#clockout").on("click", function() {
+   $.ajax({
+        url: url_host + 'out',
+        dataType: data_type_json,
+        success: function(data) {
+            $("#feedback").html(data.msg);
+        },
+    });
+});
 
-//         if(request.readyState === 4 && request.status === 200) {
-//             var alertMessage = request.responseText;
-//             document.getElementById("feedback").innerHTML = alertMessage;
-//         }
-//     };
-//     request.open('GET', 'http://localhost:5000/out');
-//     request.send();
-// });
 
-$("#total-time-this-week").bind( "click", function() {
-    var request = new XMLHttpRequest();
-    request.onreadystatechange = function () {
+$("#total-time-this-week").on("click", function() {
 
-        if(request.readyState === 4 && request.status === 200) {
-            var res = JSON.parse(request.responseText);
+    $.ajax({
+        url: url_host + 'total_time_this_week',
+        dataType: data_type_json,
+        success: function(data) {
+            var res = data;
             $('#table').show();
             $('#edit-area').hide();
-            myTable = document.getElementById("table");
+            myTable = $("#table");
             var entryRows = "<tr><th>Day</th><th>Hours</th></tr>";
 
             var weekdayList = [
@@ -120,22 +73,20 @@ $("#total-time-this-week").bind( "click", function() {
 
             }
             $("#feedback").html(res.message);
-            myTable.innerHTML = entryRows;
-        }
-    };
-  request.open('GET', 'http://localhost:5000/total_time_this_week');
-  request.send();
+            myTable.html(entryRows);
+        },
+    });
 });
 
 $( "#list-entries" ).bind( "click", function() {
-    var request = new XMLHttpRequest();
-    request.onreadystatechange = function () {
-
-        if(request.readyState === 4 && request.status === 200) {
-            var res = JSON.parse(request.responseText);
+    $.ajax({
+        url: url_host + 'list_entries',
+        dataType: data_type_json,
+        success: function(data) {
+            var res = data;
             $('#table').show();
             $('#edit-area').hide();
-            myTable = document.getElementById("table");
+            myTable = $("#table");
 
             var entryRows = "<tr><th>in</th><th>out</th></tr>";
             for (var i=0; i<res.length; i++) {
@@ -148,36 +99,33 @@ $( "#list-entries" ).bind( "click", function() {
 
                 row += "</tr>";
                 entryRows += row;
-
             }
-        myTable.innerHTML = entryRows
-        }
-    };
-  request.open('GET', 'http://localhost:5000/list_entries');
-  request.send();
-});
-
-$( "#edit" ).bind( "click", function() {
-    var request = new XMLHttpRequest();
-    request.onreadystatechange = function () {
-
-        if(request.readyState === 4 && request.status === 200) {
-            var res = JSON.parse(request.responseText);
-            $('#table').hide();
-            $('#edit-area').show();
-        }
-    };
-  request.open('GET', 'http://localhost:5000/list_entries');
-  request.send();
-});
-
-$('#date-picker').change(function(){
-    date_string = $('#date-picker').val();
-    $.ajax({
-        url:'http://localhost:5000/select_day',
-        data: {day:date_string},
-        method: "POST"
-    }).done(function(data){
-        $("#edit-area").append(data)
+            myTable.html(entryRows);
+        },
     });
 });
+
+//$( "#edit" ).bind( "click", function() {
+//    var request = new XMLHttpRequest();
+//    request.onreadystatechange = function () {
+//
+//        if(request.readyState === 4 && request.status === 200) {
+//            var res = JSON.parse(request.responseText);
+//            $('#table').hide();
+//            $('#edit-area').show();
+//        }
+//    };
+//  request.open('GET', 'http://localhost:5000/list_entries');
+//  request.send();
+//});
+//
+//$('#date-picker').change(function(){
+//    date_string = $('#date-picker').val();
+//    $.ajax({
+//        url:'http://localhost:5000/select_day',
+//        data: {day:date_string},
+//        method: "POST"
+//    }).done(function(data){
+//        $("#edit-area").append(data)
+//    });
+//});

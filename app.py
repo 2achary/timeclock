@@ -31,7 +31,7 @@ def list_entries():
 @app.route("/total_time_today")
 def total_time_today():
     clock = ClockIn()
-    return clock.total_time_today()
+    return jsonify(msg=clock.total_time_today())
 
 
 @app.route("/total_time_this_week")
@@ -45,3 +45,6 @@ def select_day():
     return request.form.get("day")
 
 
+if __name__ == "__main__":
+    # app.run()
+    pass
