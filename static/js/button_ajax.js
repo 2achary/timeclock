@@ -12,31 +12,76 @@ $( "#total-time-today" ).bind( "click", function() {
     request.send();
 });
 
-$( "#clockin" ).bind( "click", function() {
-    var request = new XMLHttpRequest();
-    request.onreadystatechange = function () {
+// $( "#clockin" ).bind( "click", function() {
+//     var request = new XMLHttpRequest();
+//     request.onreadystatechange = function () {
 
-        if(request.readyState === 4 && request.status === 200) {
-            var alertMessage = request.responseText;
-            document.getElementById("feedback").innerHTML = alertMessage;
+//         if(request.readyState === 4 && request.status === 200) {
+//             var alertMessage = request.responseText;
+//             document.getElementById("feedback").innerHTML = alertMessage;
+//         }
+//     };
+//     request.open('GET', 'http://2achary.pythonanywhere.com/in');
+//     request.send();
+// });
+
+
+$("#clockin").on("click", function(e) {
+   e.preventDefault();
+
+   $.ajax({
+        type: 'GET',
+        url: 'http://2achary.pythonanywhere.com/in',
+        dataType: "json",
+        success: function(data) {
+            console.log(data.msg);
+
+        },
+        error: function(data) {
+            console.log("There was an error");
+
+        },
+        done: function(data) {
+            console.log("All done!")
         }
-    };
-    request.open('GET', 'http://localhost:5000/in');
-    request.send();
+    });
 });
 
-$( "#clockout" ).bind( "click", function() {
-    var request = new XMLHttpRequest();
-    request.onreadystatechange = function () {
 
-        if(request.readyState === 4 && request.status === 200) {
-            var alertMessage = request.responseText;
-            document.getElementById("feedback").innerHTML = alertMessage;
+$("#clockout").on("click", function(e) {
+   e.preventDefault();
+
+   $.ajax({
+        type: 'GET',
+        url: 'http://2achary.pythonanywhere.com/out',
+        dataType: "json",
+        success: function(data) {
+            console.log(data.msg);
+
+        },
+        error: function(data) {
+            console.log("There was an error");
+
+        },
+        done: function(data) {
+            console.log("All done!")
         }
-    };
-    request.open('GET', 'http://localhost:5000/out');
-    request.send();
+    });
 });
+
+
+// $( "#clockout" ).bind( "click", function() {
+//     var request = new XMLHttpRequest();
+//     request.onreadystatechange = function () {
+
+//         if(request.readyState === 4 && request.status === 200) {
+//             var alertMessage = request.responseText;
+//             document.getElementById("feedback").innerHTML = alertMessage;
+//         }
+//     };
+//     request.open('GET', 'http://localhost:5000/out');
+//     request.send();
+// });
 
 $("#total-time-this-week").bind( "click", function() {
     var request = new XMLHttpRequest();

@@ -1,20 +1,20 @@
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, jsonify
 from ClockIn import ClockIn
 app = Flask(__name__)
 
 
-@app.route("/in")
+@app.route("/in", methods=['GET', 'POST'])
 def clock_that_bitch_in():
     clock = ClockIn()
     message = clock.punch_in()
-    return message
+    return jsonify(msg=message)
 
 
-@app.route("/out")
+@app.route("/out", methods=['GET', 'POST'])
 def clock_that_bitch_out():
     clock = ClockIn()
     message = clock.punch_out()
-    return message
+    return jsonify(msg=message)
 
 
 @app.route("/")
@@ -45,11 +45,3 @@ def select_day():
     return request.form.get("day")
 
 
-if __name__ == "__main__":
-    app.run(debug=True)
-    # pass
-    # import time
-    # c = ClockIn()
-    # c.punch_in()
-    # time.sleep(3)
-    # c.punch_out()

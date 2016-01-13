@@ -267,9 +267,4 @@ class ClockIn(object):
 
 
 if __name__ == "__main__":
-    c = ClockIn()
-    c.punch_in()
-    time.sleep(3)
-    c.punch_out()
-    time.sleep(3)
-    print(c.total_time_this_week())
+    pass
