@@ -110,7 +110,11 @@ $( "#list-entries" ).bind( "click", function() {
                 var row = "<tr>" ;
 
                 row += "<td>" + myObj.in + "</td>";
-                row += "<td>" + myObj.out + "</td>";
+                if (myObj.out == null){
+                    row += "<td></td>"
+                } else {
+                    row += "<td>" + myObj.out + "</td>";
+                }
 
                 row += "</tr>";
                 entryRows += row;
@@ -144,3 +148,4 @@ $( "#list-entries" ).bind( "click", function() {
 //        $("#edit-area").append(data)
 //    });
 //});
+

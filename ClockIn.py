@@ -26,7 +26,7 @@ class ClockIn(object):
         is_clocked_in = shelf['is-clocked-in']
 
         if not is_clocked_in:
-            time_stamp = datetime.datetime.now()
+            time_stamp = datetime.datetime.utcnow()
             key_name = time_stamp.isoformat()
             shelf['is-clocked-in'] = True
             entry = {"in": time_stamp, "out": None}
@@ -34,10 +34,10 @@ class ClockIn(object):
             shelf['most_recent'] = key_name
             shelf.close()
             print(time_stamp)
-            return json.dumps({"msg":time_stamp})
+            return json.dumps({"msg": time_stamp.isoformat()})
 
         else:
-            return False
+            return json.dumps({"msg": False})
 
     def punch_out(self):
         self._get_today()
@@ -49,15 +49,15 @@ class ClockIn(object):
 
         if is_clocked_in:
             shelf['is-clocked-in'] = False
-            time_stamp = datetime.datetime.now()
+            time_stamp = datetime.datetime.utcnow()
             entry = shelf[shelf['most_recent']]
             entry['out'] = time_stamp
             shelf[shelf['most_recent']] = entry
             shelf.close()
 
-            return json.dumps({"msg":time_stamp})
+            return json.dumps({"msg":time_stamp.isoformat()})
         else:
-            return False
+            return json.dumps({"msg": False})
 
     def total_time_today(self):
         self._get_today()
@@ -100,25 +100,26 @@ class ClockIn(object):
         }
 
         #get today's iso number
-        today = datetime.datetime.today()
-        today_iso = datetime.datetime.today().isoweekday()
+        today = datetime.datetime.utcnow()
+        today_iso = datetime.datetime.utcnow().isoweekday()
 
-        #store monday reference
+        # store monday reference by finding difference between
+        # current iso number and 1 then subtracting the difference
+        # which will always result in 1 which is monday
         td = datetime.timedelta(days=today_iso - 1)
         weekday = today - td
 
         #start the while loop to add the times
         counter = 0
-        sum_of_durs = 0
+        sum_of_durs = 0.0
         shelf = None
         while counter <= 7:
 
             # #printweekday.isoweekday()
-            fn = "{}_timesheet.shelf.db".format(weekday.date().isoformat())
+            fn = "{}_timesheet.shelf".format(weekday.date().isoformat())
             print(fn)
-            if path.isfile(fn):
-
-                shelf_name = fn[:-3]
+            try:
+                shelf_name = fn
                 day_durs_sum = self._sum_of_durs(shelf_name)
 
                 summary[iso_day_lookup[
@@ -126,7 +127,9 @@ class ClockIn(object):
                 ]] = day_durs_sum
 
                 sum_of_durs += day_durs_sum
-
+            except Exception as e:
+                raise Exception(str(e))
+                pass
             #increment the timedelta
             counter += 1
             td = datetime.timedelta(days=1)
@@ -267,4 +270,6 @@ class ClockIn(object):
 
 
 if __name__ == "__main__":
-    pass
+
+    c = ClockIn()
+    print(c.total_time_this_week())
