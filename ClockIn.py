@@ -157,10 +157,10 @@ class ClockIn(object):
             shelf_objects.append(shelf[entry])
 
         for entry in shelf_objects:
-            readable = {'in': entry['in'].strftime(self.__time_format)}
+            readable = {'in': entry['in'].isoformat()}
 
             if entry['out']:
-                readable['out'] = entry['out'].strftime(self.__time_format)
+                readable['out'] = entry['out'].isoformat()
 
             shelf_list.append(readable)
         return json.dumps(sorted(shelf_list, key=lambda dct: dct['in']))

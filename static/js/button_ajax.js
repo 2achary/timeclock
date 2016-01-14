@@ -109,11 +109,15 @@ $( "#list-entries" ).bind( "click", function() {
                 console.log(myObj);
                 var row = "<tr>" ;
 
-                row += "<td>" + myObj.in + "</td>";
+                var inTime = new Date(myObj.in);
+                var inTimeLocal = inTime.toLocaleTimeString({timeZone:['America/Chicago']});
+                row += "<td>" + inTimeLocal + "</td>";
                 if (myObj.out == null){
                     row += "<td></td>"
                 } else {
-                    row += "<td>" + myObj.out + "</td>";
+                    var outTime = new Date(myObj.out);
+                    var outTimeLocal = outTime.toLocaleTimeString({timeZone:['America/Chicago']});
+                    row += "<td>" + outTimeLocal + "</td>";
                 }
 
                 row += "</tr>";
