@@ -18,7 +18,15 @@ $("#clockin").on("click", function() {
         url: url_host + 'in',
         dataType: data_type_json,
         success: function(data) {
-            $("#feedback").html(data.msg);
+            console.log(data.msg);
+            if (data.msg == false) {
+                $("#feedback").html("Already clocked in")
+            } else {
+                var inTime = new Date(data.msg);
+                var message = "Clocked in at ";
+                message += inTime.toLocaleTimeString({timeZone:['America/Chicago']});
+                $("#feedback").html(message);
+            }
         },
     });
 });
@@ -29,7 +37,14 @@ $("#clockout").on("click", function() {
         url: url_host + 'out',
         dataType: data_type_json,
         success: function(data) {
-            $("#feedback").html(data.msg);
+            if (data.msg == false) {
+                $("#feedback").html("Not clocked in")
+            } else {
+                var inTime = new Date(data.msg);
+                var message = "Clocked out at ";
+                message += inTime.toLocaleTimeString({timeZone:['America/Chicago']});
+                $("#feedback").html(message);
+            }
         },
     });
 });

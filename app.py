@@ -7,14 +7,14 @@ app = Flask(__name__)
 def clock_that_bitch_in():
     clock = ClockIn()
     message = clock.punch_in()
-    return jsonify(msg=message)
+    return message
 
 
 @app.route("/out", methods=['GET', 'POST'])
 def clock_that_bitch_out():
     clock = ClockIn()
     message = clock.punch_out()
-    return jsonify(msg=message)
+    return message
 
 
 @app.route("/")
@@ -46,5 +46,5 @@ def select_day():
 
 
 if __name__ == "__main__":
-    # app.run()
+    app.run(debug=True)
     pass

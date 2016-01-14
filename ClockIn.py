@@ -33,10 +33,11 @@ class ClockIn(object):
             shelf[key_name] = entry
             shelf['most_recent'] = key_name
             shelf.close()
-            return "\nClocked in at {}".format(time_stamp.strftime(
-                self.__time_format))
+            print(time_stamp)
+            return json.dumps({"msg":time_stamp})
+
         else:
-            return "Already clocked in"
+            return False
 
     def punch_out(self):
         self._get_today()
@@ -54,10 +55,9 @@ class ClockIn(object):
             shelf[shelf['most_recent']] = entry
             shelf.close()
 
-            return "\nClocked out at {}\n".format(time_stamp.strftime(
-                self.__time_format))
+            return json.dumps({"msg":time_stamp})
         else:
-            return "\nNot clocked in\n"
+            return False
 
     def total_time_today(self):
         self._get_today()
