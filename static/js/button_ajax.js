@@ -7,7 +7,7 @@ $( "#total-time-today" ).on("click", function() {
         dataType: data_type_json,
         success: function(data) {
             $("#table").hide();
-            $("#feedback").html(data.msg);
+            $("#feedback").html(data.response.msg);
         },
     });
 });
@@ -18,11 +18,11 @@ $("#clockin").on("click", function() {
         url: url_host + 'in',
         dataType: data_type_json,
         success: function(data) {
-            console.log(data.msg);
-            if (data.msg == false) {
+            console.log(data);
+            if (data.processed == false) {
                 $("#feedback").html("Already clocked in")
             } else {
-                var inTime = new Date(data.msg);
+                var inTime = new Date(data.response.ts);
                 var message = "Clocked in at ";
                 message += inTime.toLocaleTimeString({timeZone:['America/Chicago']});
                 $("#feedback").html(message);
@@ -37,10 +37,10 @@ $("#clockout").on("click", function() {
         url: url_host + 'out',
         dataType: data_type_json,
         success: function(data) {
-            if (data.msg == false) {
+            if (data.processed == false) {
                 $("#feedback").html("Not clocked in")
             } else {
-                var inTime = new Date(data.msg);
+                var inTime = new Date(data.response.ts);
                 var message = "Clocked out at ";
                 message += inTime.toLocaleTimeString({timeZone:['America/Chicago']});
                 $("#feedback").html(message);
@@ -56,7 +56,7 @@ $("#total-time-this-week").on("click", function() {
         url: url_host + 'total_time_this_week',
         dataType: data_type_json,
         success: function(data) {
-            var res = data;
+            var res = data.response.msg;
             $('#table').show();
             $('#edit-area').hide();
             myTable = $("#table");
@@ -98,7 +98,10 @@ $( "#list-entries" ).bind( "click", function() {
         url: url_host + 'list_entries',
         dataType: data_type_json,
         success: function(data) {
-            var res = data;
+            if (data.processed == false){
+                return
+            }
+            var res = data.response;
             $('#table').show();
             $('#edit-area').hide();
             myTable = $("#table");

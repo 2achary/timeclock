@@ -6,15 +6,13 @@ app = Flask(__name__)
 @app.route("/in", methods=['GET', 'POST'])
 def clock_that_bitch_in():
     clock = ClockIn()
-    message = clock.punch_in()
-    return message
+    return clock.punch_in()
 
 
 @app.route("/out", methods=['GET', 'POST'])
 def clock_that_bitch_out():
     clock = ClockIn()
-    message = clock.punch_out()
-    return message
+    return clock.punch_out()
 
 
 @app.route("/")
@@ -31,7 +29,7 @@ def list_entries():
 @app.route("/total_time_today")
 def total_time_today():
     clock = ClockIn()
-    return jsonify(msg=clock.total_time_today())
+    return clock.total_time_today()
 
 
 @app.route("/total_time_this_week")
@@ -39,10 +37,6 @@ def total_time_this_week():
     clock = ClockIn()
     return clock.total_time_this_week()
 
-
-@app.route("/select_day", methods=['POST'])
-def select_day():
-    return request.form.get("day")
 
 
 if __name__ == "__main__":
