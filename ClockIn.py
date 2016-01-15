@@ -1,6 +1,7 @@
 import datetime
 import shelve
 import json
+from models import TimeSheet
 
 
 class ClockIn(object):
@@ -20,34 +21,36 @@ class ClockIn(object):
         return json.dumps(ret)
 
     @staticmethod
-    def _get_most_recent_ts(shelf):
-        return sorted(list(shelf.keys()))[-1]
+    def _get_newest():
+        return TimeSheet.select().order_by(TimeSheet.id.desc())[0].id
 
-    def _is_clocked_in(self, shelf):
-        try:
-            return shelf[self._get_most_recent_ts(shelf)]['out'] is None
-        except IndexError:
-            return False
+    @staticmethod
+    def _is_clocked_in(time_id):
+        return TimeSheet.get(TimeSheet.id == time_id).time_out is None
 
     def punch_in(self):
-        with shelve.open(self.__shelf_name, writeback=True) as shelf:
-            if self._is_clocked_in(shelf):
-                return self._response()
 
-            ts = datetime.datetime.utcnow()
-            ts_iso = ts.isoformat()
-            shelf[ts_iso] = {"in": ts, "out": None}
-            return self._response(response={"ts": ts_iso})
+        if self._is_clocked_in(self._get_newest()):
+            return self._response()
+
+        ts = datetime.datetime.utcnow()
+        t = TimeSheet(time_in=ts, user_id=1)
+        t.save()
+
+        ts_iso = ts.isoformat()
+        return self._response(response={"ts": ts_iso})
 
     def punch_out(self):
-        with shelve.open(self.__shelf_name, writeback=True) as shelf:
-            if not self._is_clocked_in(shelf):
+        row_id = self._get_newest()
+        if not self._is_clocked_in(row_id):
                 return self._response()
 
-            ts = datetime.datetime.utcnow()
-            ts_iso = ts.isoformat()
-            shelf[self._get_most_recent_ts(shelf)]['out'] = ts
-            return self._response(response={"ts": ts_iso})
+        ts = datetime.datetime.utcnow()
+        q = TimeSheet.update(time_out=ts).where(TimeSheet.id == row_id)
+        q.execute()
+
+        ts_iso = ts.isoformat()
+        return self._response(response={"ts": ts_iso})
 
     def total_time_today(self):
         duration = self._sum_of_durs(self.__shelf_name)
@@ -140,4 +143,4 @@ class ClockIn(object):
 if __name__ == "__main__":
 
     c = ClockIn()
-    print(c.list_entries_for_day())
+    print(c.punch_out())
