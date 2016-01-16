@@ -124,7 +124,7 @@ class ClockIn(object):
         sum_of_durs = 0.0
         while counter <= 7:
 
-            res = self.total_time_today(day_offset=+day_offset)
+            res = self.total_time_today(day_offset=day_offset)
             day_total = json.loads(res)['response']['msg']
             sum_of_durs += day_total
 
