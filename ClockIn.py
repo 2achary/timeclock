@@ -68,16 +68,19 @@ class ClockIn(object):
         today = datetime.datetime.utcnow() - td_hours
         # apply offset
         today = today + datetime.timedelta(days=day_offset)
-        # drop everything smaller than day
-        today.replace(hour=0, minute=0, second=0, microsecond=0)
+
+        # drop everything smaller than day and for some reason
+        # today.replace(hour=0, minute=0, second=0, microsecond=0)
+        # was not working at all. so this is my work around
+        day = datetime.datetime(today.year, today.month, today.day)
         # get some time deltas for some UTC math
 
         td_day = datetime.timedelta(days=1)
-        date_min = today - td_hours
-        date_max = today + td_day - td_hours
+        date_min = day - td_hours
 
+        date_max = day + td_day - td_hours
         return TimeSheet.select().where(
-            TimeSheet.time_in <= date_max and TimeSheet.time_in >= date_min)
+            TimeSheet.time_in <= date_max, TimeSheet.time_in >= date_min)
 
     def total_time_today(self, day_offset=0):
 
@@ -160,4 +163,4 @@ class ClockIn(object):
 if __name__ == "__main__":
 
     c = ClockIn()
-    print(c.list_entries_for_day())
+    print(c.total_time_today(day_offset=-3))
