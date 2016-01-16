@@ -7,7 +7,7 @@ $( "#total-time-today" ).on("click", function() {
         dataType: data_type_json,
         success: function(data) {
             $("#table").hide();
-            $("#feedback").html(data.response.msg);
+            $("#feedback").html("Total hours today: " + data.response.msg);
         },
     });
 });

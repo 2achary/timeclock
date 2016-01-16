@@ -22,11 +22,17 @@ class ClockIn(object):
 
     @staticmethod
     def _get_newest():
-        return TimeSheet.select().order_by(TimeSheet.id.desc())[0].id
+        try:
+            return TimeSheet.select().order_by(TimeSheet.id.desc())[0].id
+        except Exception:
+            raise
 
     @staticmethod
     def _is_clocked_in(time_id):
-        return TimeSheet.get(TimeSheet.id == time_id).time_out is None
+        try:
+            return TimeSheet.get(TimeSheet.id == time_id).time_out is None
+        except Exception:
+            return False
 
     def punch_in(self):
 
@@ -43,7 +49,7 @@ class ClockIn(object):
     def punch_out(self):
         row_id = self._get_newest()
         if not self._is_clocked_in(row_id):
-                return self._response()
+            return self._response()
 
         ts = datetime.datetime.utcnow()
         q = TimeSheet.update(time_out=ts).where(TimeSheet.id == row_id)

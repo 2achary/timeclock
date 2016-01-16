@@ -40,5 +40,5 @@ def total_time_this_week():
 
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    # app.run(debug=True)
     pass
