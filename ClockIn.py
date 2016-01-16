@@ -25,7 +25,7 @@ class ClockIn(object):
         try:
             return TimeSheet.select().order_by(TimeSheet.id.desc())[0].id
         except Exception:
-            raise
+            pass
 
     @staticmethod
     def _is_clocked_in(time_id):

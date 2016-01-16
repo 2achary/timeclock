@@ -23,12 +23,11 @@ class TimeSheet(peewee.Model):
 
 
 if __name__ == '__main__':
-    try:
-        mysql_db.connect()
-        mysql_db.create_tables([TimeSheet, User])
-        u = User(username='2achary')
-        u.save()
-    except Exception:
-        pass
+    pass
+    # mysql_db.connect()
+    # mysql_db.create_tables([TimeSheet])
+    # u = User(username='2achary')
+    # u.save()
+
 
 
