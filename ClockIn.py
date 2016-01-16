@@ -7,7 +7,7 @@ from models import TimeSheet
 class ClockIn(object):
 
     @property
-    def __shelf_name(self):
+    def _today_iso(self):
         return datetime.datetime.utcnow().isoformat().split('T')[0]
 
     @staticmethod
@@ -52,24 +52,37 @@ class ClockIn(object):
         ts_iso = ts.isoformat()
         return self._response(response={"ts": ts_iso})
 
-    def total_time_today(self):
-        duration = self._sum_of_durs(self.__shelf_name)
-        return self._response(response={'msg': "{} hours".format(duration)})
+    def _get_todays_records(self, day_offset=0):
+        # central time is 6 hours before utc
+        td_hours = datetime.timedelta(hours=6)
+        # get today
+        today = datetime.datetime.utcnow() - td_hours
+        # apply offset
+        today = today + datetime.timedelta(days=day_offset)
+        # drop everything smaller than day
+        today.replace(hour=0, minute=0, second=0, microsecond=0)
+        # get some time deltas for some UTC math
 
-    def _sum_of_durs(self, shelf_name):
-        durations = []
-        with shelve.open(shelf_name, writeback=True) as shelf:
-            for entry in shelf:
-                start = shelf[entry]['in']
-                if shelf[entry]['out']:
-                    finish = shelf[entry]['out']
-                else:
-                    finish = datetime.datetime.now()
-                duration = finish - start
-                durations.append(duration.total_seconds())
+        td_day = datetime.timedelta(days=1)
+        date_min = today - td_hours
+        date_max = today + td_day - td_hours
 
-        sum_of_durs = sum(durations)
-        return self._get_hours(sum_of_durs)
+        return TimeSheet.select().where(
+            TimeSheet.time_in <= date_max and TimeSheet.time_in >= date_min)
+
+    def total_time_today(self, day_offset=0):
+
+        duration = 0
+        entries = self._get_todays_records(day_offset=day_offset)
+        for entry in entries:
+            start = entry.time_in
+            if entry.time_out:
+                finish = entry.time_out
+            else:
+                finish = datetime.datetime.utcnow()
+            duration += (finish - start).total_seconds()
+        duration_hours = self._get_hours(duration)
+        return self._response(response={'msg': duration_hours})
 
     def total_time_this_week(self):
 
@@ -86,42 +99,37 @@ class ClockIn(object):
         }
 
         #get today's iso number
-        today = datetime.datetime.utcnow()
-        today_iso = datetime.datetime.utcnow().isoweekday()
+        td_hours = datetime.timedelta(days=6)
+        today = datetime.datetime.utcnow() - td_hours
+        today_iso = today.isoweekday()
 
         # store monday reference by finding difference between
         # current iso number and 1 then subtracting the difference
         # which will always result in 1 which is monday
-        td = datetime.timedelta(days=today_iso - 1)
-        weekday = today - td
+        offset = datetime.timedelta(days=today_iso - 1)
+        day_offset = today_iso - 1
+        weekday = today - offset
 
         #start the while loop to add the times
         counter = 0
         sum_of_durs = 0.0
-        shelf = None
         while counter <= 7:
 
-            # #printweekday.isoweekday()
-            fn = weekday.date().isoformat()
-            print(fn)
-            try:
-                shelf_name = fn
-                day_durs_sum = self._sum_of_durs(shelf_name)
+            res = self.total_time_today(day_offset=-day_offset)
+            day_total = json.loads(res)['response']['msg']
+            sum_of_durs += day_total
 
-                summary[iso_day_lookup[
-                    weekday.isoweekday()
-                ]] = day_durs_sum
+            summary[iso_day_lookup[
+                weekday.isoweekday()
+            ]] = round(day_total, 2)
 
-                sum_of_durs += day_durs_sum
-            except Exception as e:
-                raise Exception(str(e))
-                pass
-            #increment the timedelta
+            # increment the weekday and counter
             counter += 1
             td = datetime.timedelta(days=1)
             weekday = weekday + td
+            day_offset += 1
 
-        summary['message'] = "{} hours this week".format(sum_of_durs)
+        summary['message'] = "{} hours this week".format(round(sum_of_durs, 2))
         return self._response({'msg': summary})
 
     @staticmethod
@@ -130,17 +138,17 @@ class ClockIn(object):
 
     def list_entries_for_day(self):
         shelf_list = []
-        with shelve.open(self.__shelf_name, writeback=True) as shelf:
-            for entry in shelf:
-                isofied = {'in': shelf[entry]['in'].isoformat()}
-                if shelf[entry]['out']:
-                    isofied['out'] = shelf[entry]['out'].isoformat()
 
-                shelf_list.append(isofied)
+        for entry in self._get_todays_records():
+            isofied = {'in': entry.time_in.isoformat()}
+            if entry.time_out:
+                isofied['out'] = entry.time_out.isoformat()
+
+            shelf_list.append(isofied)
 
         return self._response(response=sorted(shelf_list, key=lambda dct: dct['in']))
 
 if __name__ == "__main__":
 
     c = ClockIn()
-    print(c.punch_out())
+    print(c.list_entries_for_day())
