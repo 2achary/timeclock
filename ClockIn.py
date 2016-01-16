@@ -65,20 +65,24 @@ class ClockIn(object):
         # central time is 6 hours before utc
         td_hours = datetime.timedelta(hours=6)
         # get today
-        today = datetime.datetime.utcnow() - td_hours
+        today = datetime.datetime.utcnow()
+        print('today minus 6 hours: ', today)
         # apply offset
         today = today + datetime.timedelta(days=day_offset)
+        print('today plus the offset: ', today)
 
         # drop everything smaller than day and for some reason
         # today.replace(hour=0, minute=0, second=0, microsecond=0)
         # was not working at all. so this is my work around
         day = datetime.datetime(today.year, today.month, today.day)
+        print('gutted day: ', day)
         # get some time deltas for some UTC math
 
         td_day = datetime.timedelta(days=1)
-        date_min = day - td_hours
+        date_min = day
 
-        date_max = day + td_day - td_hours
+        date_max = day + td_day
+        print(date_min, date_max)
         return TimeSheet.select().where(
             TimeSheet.time_in <= date_max, TimeSheet.time_in >= date_min)
 
@@ -110,16 +114,23 @@ class ClockIn(object):
             7: "Sunday"
         }
 
-        #get today's iso number
+        # get today's iso number
+        # so there is a 6 hour difference for central
+        # I have to store two isoweekday values because half the damn day
+        # is a day ahead if you go by utc. So I have to query the utc dates
+        # but attribute those durations to centraltime isoweekday
         td_hours = datetime.timedelta(days=6)
-        today = datetime.datetime.utcnow() - td_hours
-        today_iso = today.isoweekday()
+        # which is utc today
+        today = datetime.datetime.utcnow()
+        today_central = datetime.datetime.utcnow() - td_hours
+        today_iso = today_central.isoweekday()
+        utc_iso = today.isoweekday()
 
         # store monday reference by finding difference between
         # current iso number and 1 then subtracting the difference
         # which will always result in 1 which is monday
         offset = datetime.timedelta(days=today_iso - 1)
-        day_offset = -(today_iso - 1)
+        day_offset = -(utc_iso - 1)
         weekday = today - offset
 
         #start the while loop to add the times
@@ -163,4 +174,4 @@ class ClockIn(object):
 if __name__ == "__main__":
 
     c = ClockIn()
-    print(c.total_time_today(day_offset=-3))
+    print(c.list_entries_for_day())
