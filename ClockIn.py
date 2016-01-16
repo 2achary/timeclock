@@ -47,8 +47,11 @@ class ClockIn(object):
         return self._response(response={"ts": ts_iso})
 
     def punch_out(self):
-        row_id = self._get_newest()
-        if not self._is_clocked_in(row_id):
+        try:
+            row_id = self._get_newest()
+            if not self._is_clocked_in(row_id):
+                return self._response()
+        except Exception:
             return self._response()
 
         ts = datetime.datetime.utcnow()
