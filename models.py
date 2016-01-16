@@ -1,8 +1,10 @@
 import peewee
 import settings
 from playhouse.db_url import connect
+from playhouse.pool import PooledMySQLDatabase
 
-mysql_db = connect(settings.mysql_url)
+
+mysql_db = PooledMySQLDatabase(settings.db_name, **settings.kwargs)
 
 
 class User(peewee.Model):
