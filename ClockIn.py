@@ -62,27 +62,23 @@ class ClockIn(object):
         return self._response(response={"ts": ts_iso})
 
     def _get_todays_records(self, day_offset=0):
-        # central time is 6 hours before utc
-        td_hours = datetime.timedelta(hours=6)
         # get today
-        today = datetime.datetime.utcnow()
-        print('today minus 6 hours: ', today)
+        today = datetime.datetime.now()
         # apply offset
         today = today + datetime.timedelta(days=day_offset)
-        print('today plus the offset: ', today)
 
         # drop everything smaller than day and for some reason
         # today.replace(hour=0, minute=0, second=0, microsecond=0)
         # was not working at all. so this is my work around
         day = datetime.datetime(today.year, today.month, today.day)
-        print('gutted day: ', day)
-        # get some time deltas for some UTC math
 
+        # make time deltas for some UTC math
+        # central time is 6 hours before utc
+        td_hours = datetime.timedelta(hours=6)
         td_day = datetime.timedelta(days=1)
-        date_min = day
+        date_min = day - td_hours
 
-        date_max = day + td_day
-        print(date_min, date_max)
+        date_max = date_min + td_day
         return TimeSheet.select().where(
             TimeSheet.time_in <= date_max, TimeSheet.time_in >= date_min)
 
@@ -174,4 +170,5 @@ class ClockIn(object):
 if __name__ == "__main__":
 
     c = ClockIn()
-    print(c.list_entries_for_day())
+    for t in c._get_todays_records(day_offset=-1):
+        print(t.time_in)
