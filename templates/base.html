@@ -12,15 +12,12 @@
 	<body>
         <div class="container">
 
-            <div class="row">
-                <div class="col-md-12 col-lg-12 col-xl-12">
+
                     <h3 id="feedback">Time Clock</h3>
-                </div>
-            </div>
 
-            <div class="row">
-                <div class="col-md-12 col-lg-12 col-xl-12">
 
+
+                <div class="in_out">
                     <button
                         id="clockin"
                         class="btn btn-info btn-lg"
@@ -35,13 +32,15 @@
                         <!--id="edit"-->
                         <!--class="btn btn-default btn-lg"-->
                         <!--type="submit">edit</button>-->
-
                 </div>
-            </div>
 
-            <div class="row">
-                <div class="col-md-12 col-lg-12 col-xl-12">
+                <div class="in_out">
+                <span id="list-options" class="glyphs glyphicon glyphicon-th-list" aria-hidden="true"></span>
+                <span id="user-button" class="glyphs glyphicon glyphicon-user" aria-hidden="true"></span>
+                </div>
 
+
+                <div class="view_stats">
                     <button
                         id="list-entries"
                         class="btn btn-default btn-lg"
@@ -57,11 +56,9 @@
                         class="btn btn-default btn-lg"
                         type="submit">total this week</button>
 
-                </div>
-            </div>
 
-            <div class="row">
-                <div class="col-md-12 col-lg-12 col-xl-12 table-container">
+
+                    <div class="table-container">
                     <table id="table" class="table"></table>
                     <!--<div id="edit-area">-->
                         <!--<div class="col-md-6 col-sm-8 col-lg-6 col-xl-6 col-xs-8">-->
@@ -69,8 +66,8 @@
                             <!--<input class='form-control' id='date-picker' type="date">-->
                         <!--</div>-->
                     <!--</div>-->
+                        </div>
                 </div>
-            </div>
 
 		</div>
 

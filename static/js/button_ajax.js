@@ -1,5 +1,22 @@
 var url_host = '';
 var data_type_json = 'json';
+var listShown = false;
+
+$( document ).ready(function(){
+    $(".view_stats").hide();
+})
+
+$("#list-options").on("click", function(){
+    if (listShown) {
+        $(".view_stats").hide();
+        $("#table").hide();
+        listShown = false;
+    } else {
+        $(".view_stats").show();
+        listShown = true;
+    }
+
+})
 
 $( "#total-time-today" ).on("click", function() {
     $.ajax({
