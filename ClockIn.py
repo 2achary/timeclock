@@ -76,7 +76,7 @@ class ClockIn(object):
         # central time is 6 hours before utc
         td_hours = datetime.timedelta(hours=6)
         td_day = datetime.timedelta(days=1)
-        date_min = day - td_hours
+        date_min = day + td_hours
 
         date_max = date_min + td_day
         return TimeSheet.select().where(
@@ -170,5 +170,4 @@ class ClockIn(object):
 if __name__ == "__main__":
 
     c = ClockIn()
-    for t in c._get_todays_records(day_offset=-1):
-        print(t.time_in)
+    print(c.list_entries_for_day())
