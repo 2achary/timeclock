@@ -137,9 +137,9 @@ class ClockIn(object):
             res = self.total_time_today(day_offset=day_offset)
             day_total = json.loads(res)['response']['msg']
             sum_of_durs += day_total
-
+            central_iso = (weekday - td_hours).isoweekday()
             summary[iso_day_lookup[
-                weekday.isoweekday()
+                central_iso
             ]] = round(day_total, 2)
 
             # increment the weekday and counter
@@ -159,7 +159,7 @@ class ClockIn(object):
         shelf_list = []
 
         for entry in self._get_todays_records():
-            isofied = {'in': entry.time_in.isoformat()}
+            isofied = {'_id': entry.id, 'in': entry.time_in.isoformat()}
             if entry.time_out:
                 isofied['out'] = entry.time_out.isoformat()
 
