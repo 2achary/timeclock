@@ -1,8 +1,16 @@
 /* Custom CSS */
-.feedback {
+#feedback {
+
     margin-bottom:15px;
     margin-bottom: 15px;
+    display: inline-block;
+    background-color: #dddddd;
+    padding: 15px 12px 15px 12px;
+    border-radius: 7px;
+    text-align: center;
+
 }
+
 
 .btn {
     min-width: 150px;
