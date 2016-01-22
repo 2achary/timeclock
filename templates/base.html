@@ -12,70 +12,67 @@
 	<body>
         <div class="container">
 
+            <h3 id="feedback">Time Clock</h3>
 
-                    <h3 id="feedback">Time Clock</h3>
+            <div class="in_out">
+                <button
+                    id="clockin"
+                    class="btn btn-info btn-lg"
+                    type="submit">punch in</button>
 
+                <button
+                    id="clockout"
+                    class="btn btn-warning btn-lg"
+                    type="submit">punch out</button>
+            </div>
 
-
-                <div class="in_out">
-                    <button
-                        id="clockin"
-                        class="btn btn-info btn-lg"
-                        type="submit">punch in</button>
-
-                    <button
-                        id="clockout"
-                        class="btn btn-warning btn-lg"
-                        type="submit">punch out</button>
-
-                    <!--<button-->
-                        <!--id="edit"-->
-                        <!--class="btn btn-default btn-lg"-->
-                        <!--type="submit">edit</button>-->
-                </div>
-
-                <div class="in_out">
-                <span id="list-options" class="glyphs glyphicon glyphicon-th-list" aria-hidden="true"></span>
-                <span id="user-button" class="glyphs glyphicon glyphicon-user" aria-hidden="true"></span>
-                </div>
+            <div class="in_out">
+                <span id="list-options"
+                      class="glyphs glyphicon glyphicon-th-list"
+                      aria-hidden="true"></span>
+                <span id="user-button"
+                      class="glyphs glyphicon glyphicon-user"
+                      aria-hidden="true"></span>
+            </div>
 
 
-                <div class="view_stats">
-                    <button
-                        id="list-entries"
-                        class="btn btn-default btn-lg"
-                        type="submit">list entries</button>
-
-                    <button
-                        id="total-time-today"
-                        class="btn btn-default btn-lg"
-                        type="submit">total today</button>
-
-                    <button
-                        id="total-time-this-week"
-                        class="btn btn-default btn-lg"
-                        type="submit">total this week</button>
+            <div class="create_user">
 
 
+            </div>
 
-                    <div class="table-container">
+            <div class="view_stats">
+                <button
+                    id="list-entries"
+                    class="btn btn-default btn-lg"
+                    type="submit">list entries</button>
+
+                <button
+                    id="total-time-today"
+                    class="btn btn-default btn-lg"
+                    type="submit">total today</button>
+
+                <button
+                    id="total-time-this-week"
+                    class="btn btn-default btn-lg"
+                    type="submit">total this week</button>
+
+                <div class="table-container">
                     <table id="table" class="table"></table>
-                    <!--<div id="edit-area">-->
-                        <!--<div class="col-md-6 col-sm-8 col-lg-6 col-xl-6 col-xs-8">-->
-                            <!--<h4>Choose date to edit</h4>-->
-                            <!--<input class='form-control' id='date-picker' type="date">-->
-                        <!--</div>-->
+                <!--<div id="edit-area">-->
+                    <!--<div class="col-md-6 col-sm-8 col-lg-6 col-xl-6 col-xs-8">-->
+                        <!--<h4>Choose date to edit</h4>-->
+                        <!--<input class='form-control' id='date-picker' type="date">-->
                     <!--</div>-->
-                        </div>
+                <!--</div>-->
                 </div>
+            </div>
 
 		</div>
-
 
         <script type="" src="{{ url_for('static', filename='js/jquery-latest.min.js') }}"></script>
         <script src="static/js/bootstrap.min.js"></script>
         <script src="static/js/button_ajax.js"></script>
-
 
 	</body>
 </html>

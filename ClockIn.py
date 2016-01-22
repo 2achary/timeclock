@@ -63,7 +63,9 @@ class ClockIn(object):
 
     def _get_todays_records(self, day_offset=0):
         # get today
-        today = datetime.datetime.now()
+        utc_today = datetime.datetime.utcnow()
+        td_hours = datetime.timedelta(hours=6)
+        today = utc_today - td_hours
         # apply offset
         today = today + datetime.timedelta(days=day_offset)
 
@@ -74,11 +76,13 @@ class ClockIn(object):
 
         # make time deltas for some UTC math
         # central time is 6 hours before utc
-        td_hours = datetime.timedelta(hours=6)
+
         td_day = datetime.timedelta(days=1)
         date_min = day + td_hours
 
         date_max = date_min + td_day
+        print('date-min', date_min.isoformat())
+        print('date-max', date_max.isoformat())
         return TimeSheet.select().where(
             TimeSheet.time_in <= date_max, TimeSheet.time_in >= date_min)
 
@@ -170,4 +174,5 @@ class ClockIn(object):
 if __name__ == "__main__":
 
     c = ClockIn()
-    print(c.list_entries_for_day())
+    print(c._get_todays_records())
+
