@@ -30,8 +30,9 @@ class User(UserMixin, peewee.Model):
                 email=email,
                 password=make_hash(password),
                 is_admin=admin)
-        except peewee.IntegrityError:
-            raise ValueError('User already exists')
+        except peewee.IntegrityError as e:
+
+            raise ValueError('User already exists: {}'.format(e))
 
 
 class TimeSheet(peewee.Model):
@@ -51,6 +52,8 @@ def initialize():
 
 
 # if __name__ == '__main__':
+#     for obj in TimeSheet.select().where(TimeSheet.user_id == 1).order_by(TimeSheet.id.desc()):
+#         print(obj.user_id.id)
 
     # mysql_db.connect()
     # TimeSheet.drop_table()

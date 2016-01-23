@@ -12,7 +12,9 @@
 	<body>
         <div class="container">
 
-            <h3 id="feedback">Time Clock</h3>
+            <h3 id="feedback">{% if response %} {{ response }} {% else %} Time Clock {% endif %}</h3>
+
+            <input id="user_id" type="text" placeholder="ID number" class="text-input">
 
             <div class="in_out">
                 <button
@@ -36,9 +38,31 @@
             </div>
 
 
-            <div class="create_user">
+            <div class="form-feedback">
 
+                <label></label><br/>
+            </div>
 
+            <div class="users">
+                <button
+                    id="create_user"
+                    class="btn btn-default btn-lg"
+                    type="submit">Create User</button>
+
+            </div>
+
+            <div id="user-form">
+                <form method="POST" action="{{url_for('register_user')}}">
+
+                    <input id="email" class="text-input-form" name="email" type="text" placeholder="email">
+                    <input id="username" class="text-input-form" name="username" type="text" placeholder="username">
+                    <input id="password" class="text-input-form" name="password" type="text" placeholder="password">
+                    <input id="verify_password" class="text-input-form" name="verify_password" type="text" placeholder="verify password">
+                    <button
+                        id="register_user"
+                        class="btn btn-default btn-lg"
+                        type="submit">Register</button>
+                </form>
             </div>
 
             <div class="view_stats">

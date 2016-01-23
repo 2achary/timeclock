@@ -21,9 +21,9 @@ class ClockIn(object):
         return json.dumps(ret)
 
     @staticmethod
-    def _get_newest():
+    def _get_newest(user_id):
         try:
-            return TimeSheet.select().order_by(TimeSheet.id.desc())[0].id
+            return TimeSheet.select().where(TimeSheet.user_id == user_id).order_by(TimeSheet.id.desc())[0].id
         except Exception:
             pass
 
@@ -34,21 +34,21 @@ class ClockIn(object):
         except Exception:
             return False
 
-    def punch_in(self):
+    def punch_in(self, user_id):
 
-        if self._is_clocked_in(self._get_newest()):
+        if self._is_clocked_in(self._get_newest(user_id)):
             return self._response()
 
         ts = datetime.datetime.utcnow()
-        t = TimeSheet(time_in=ts, user_id=1)
+        t = TimeSheet(time_in=ts, user_id=user_id)
         t.save()
 
         ts_iso = ts.isoformat()
         return self._response(response={"ts": ts_iso})
 
-    def punch_out(self):
+    def punch_out(self, user_id):
         try:
-            row_id = self._get_newest()
+            row_id = self._get_newest(user_id)
             if not self._is_clocked_in(row_id):
                 return self._response()
         except Exception:
@@ -61,7 +61,8 @@ class ClockIn(object):
         ts_iso = ts.isoformat()
         return self._response(response={"ts": ts_iso})
 
-    def _get_todays_records(self, day_offset=0):
+    @staticmethod
+    def _get_todays_records(user_id, day_offset=0):
         # get today
         utc_today = datetime.datetime.utcnow()
         td_hours = datetime.timedelta(hours=6)
@@ -84,12 +85,12 @@ class ClockIn(object):
         print('date-min', date_min.isoformat())
         print('date-max', date_max.isoformat())
         return TimeSheet.select().where(
-            TimeSheet.time_in <= date_max, TimeSheet.time_in >= date_min)
+            TimeSheet.time_in <= date_max, TimeSheet.time_in >= date_min, TimeSheet.user_id == user_id)
 
-    def total_time_today(self, day_offset=0):
+    def total_time_today(self, user_id, day_offset=0):
 
         duration = 0
-        entries = self._get_todays_records(day_offset=day_offset)
+        entries = self._get_todays_records(user_id, day_offset=day_offset)
         for entry in entries:
             start = entry.time_in
             if entry.time_out:
@@ -100,7 +101,7 @@ class ClockIn(object):
         duration_hours = self._get_hours(duration)
         return self._response(response={'msg': duration_hours})
 
-    def total_time_this_week(self):
+    def total_time_this_week(self, user_id):
 
         summary = {}
 
@@ -138,7 +139,7 @@ class ClockIn(object):
         sum_of_durs = 0.0
         while counter <= 7:
 
-            res = self.total_time_today(day_offset=day_offset)
+            res = self.total_time_today(user_id, day_offset=day_offset)
             day_total = json.loads(res)['response']['msg']
             sum_of_durs += day_total
             central_iso = (weekday - td_hours).isoweekday()
@@ -159,10 +160,10 @@ class ClockIn(object):
     def _get_hours(seconds):
         return round((seconds / 60) / 60, 2)
 
-    def list_entries_for_day(self):
+    def list_entries_for_day(self, user_id):
         shelf_list = []
 
-        for entry in self._get_todays_records():
+        for entry in self._get_todays_records(user_id):
             isofied = {'_id': entry.id, 'in': entry.time_in.isoformat()}
             if entry.time_out:
                 isofied['out'] = entry.time_out.isoformat()
@@ -173,6 +174,7 @@ class ClockIn(object):
 
 if __name__ == "__main__":
 
-    c = ClockIn()
-    print(c._get_todays_records())
+
+    for obj in ClockIn._get_todays_records(1):
+        print(obj.time_in)
 

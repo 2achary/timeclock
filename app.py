@@ -1,4 +1,5 @@
-from flask import Flask, render_template, request, jsonify
+import json
+from flask import Flask, render_template, request, jsonify, redirect, url_for
 from models import mysql_db
 from ClockIn import ClockIn
 import settings
@@ -20,39 +21,82 @@ def load_user(userid):
         return None
 
 
+def _response(errors=None, response=None):
+    ret = {}
+    if response:
+        ret['response'] = response
+    else:
+        ret['response'] = {}
+    if errors:
+        ret['errors'] = errors
+    else:
+        ret['errors'] = []
+    ret['processed'] = len(ret['errors']) is 0 or ret['response'] is not None
+    return json.dumps(ret)
+
+
+@app.route("/register", methods=['POST'])
+def register_user():
+    if not request.method == 'POST':
+        return _response(errors=['Invalid method'])
+
+    email = request.form['email']
+    username = request.form['username']
+    password = request.form['password']
+    password_verify = request.form['verify_password']
+    if password != password_verify:
+        return redirect(url_for('main', response='Passwords do not match'))
+    try:
+        models.User.create_user(username=username, email=email, password=password)
+        user = models.User.get(username=username, email=email)
+        response = "Success! your ID is: {}".format(user.id)
+
+    except Exception:
+        response = 'User with that information already exists'
+
+    return redirect(url_for('main', response=response))
+
+
 @app.route("/in", methods=['GET', 'POST'])
-def clock_that_bitch_in():
+def clock_in():
+    # user_id = request.form['user_id']
     clock = ClockIn()
-    return clock.punch_in()
+    user_id = request.args.get('user_id')
+    return clock.punch_in(user_id)
 
 
 @app.route("/out", methods=['GET', 'POST'])
-def clock_that_bitch_out():
+def clock_out():
     clock = ClockIn()
-    return clock.punch_out()
+    user_id = request.args.get('user_id')
+    return clock.punch_out(user_id)
 
 
 @app.route("/")
 def main():
-    return render_template('base.html')
+    response = request.args.get('response', "")
+    return render_template('base.html', response=response)
 
 
 @app.route("/list_entries")
 def list_entries():
     clock = ClockIn()
-    return clock.list_entries_for_day()
+    user_id = request.args.get('user_id')
+    return clock.list_entries_for_day(user_id)
 
 
 @app.route("/total_time_today")
 def total_time_today():
     clock = ClockIn()
-    return clock.total_time_today()
+    user_id = request.args.get('user_id')
+    return clock.total_time_today(user_id)
 
 
 @app.route("/total_time_this_week")
 def total_time_this_week():
     clock = ClockIn()
-    return clock.total_time_this_week()
+    user_id = request.args.get('user_id')
+    return clock.total_time_this_week(user_id)
 
 
 @app.before_request
@@ -74,14 +118,14 @@ def _db_close(exc):
         mysql_db.close()
 
 
-if __name__ == "__main__":
+# if __name__ == "__main__":
     # models.initialize()
-    # models.User.create_user(
-    #     username='2achary',
-    #     email='cras.zswift@gmail.com',
-    #     password=settings.kwargs['password'],
+    # print(models.User.create_user(
+    #     username='chuck',
+    #     email='chuck@tom.com',
+    #     password='password',
     #     admin=True
-    # )
-    app.run(debug=True)
+    # ))
+    # app.run(debug=True)
 
 

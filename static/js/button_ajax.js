@@ -1,26 +1,95 @@
 var url_host = '';
 var data_type_json = 'json';
 var listShown = false;
+var userShown = false;
 
 $( document ).ready(function(){
     $(".view_stats").hide();
+    $(".users").hide();
+    $("#user-form").hide();
 })
+
+hideListViews = function(){
+    $(".view_stats").hide();
+    $("#table").hide();
+}
+
+showListViews = function(){
+    $(".view_stats").show();
+    $("#table").show();
+}
+
+hideUserViews = function(){
+    $(".users").hide();
+    $("#user-form").hide();
+}
+
+showUserViews = function(){
+    $(".users").show();
+    $("#user-form").show()
+}
+
+
+$("#user-button").on("click", function(){
+
+    if (userShown){
+        hideUserViews();
+        userShown = false;
+    } else {
+        hideListViews();
+        $(".users").show();
+        userShown = true;
+    }
+
+});
+
+$("#create_user").on("click", function(){
+    $(".users").hide();
+    $("#user-form").show();
+});
 
 $("#list-options").on("click", function(){
     if (listShown) {
-        $(".view_stats").hide();
-        $("#table").hide();
+        hideListViews();
         listShown = false;
     } else {
+        hideUserViews();
         $(".view_stats").show();
         listShown = true;
     }
 
 })
 
+//$("#register_user").on("click", function(){
+//    $.ajax({
+//        url: 'http://127.0.0.1:5000/register',
+//        method: "GET",
+//        data: {
+//            "username": $("#username").val(),
+//            "email": $("#email").val(),
+//            "password": $("#password").val(),
+//            "verify_password": $("#verify_password").val()
+//        },
+//        dataType: data_type_json,
+//        success: function(data) {
+//            if (data.processed) {
+//                $("#form-feedback").append(data.response);
+//            } else {
+//                $("#form-feedback").append(data.errors[0]);
+//            }
+//        }
+//    })
+//});
+
 $( "#total-time-today" ).on("click", function() {
+    $idNumber = $("#user_id").val()
+    if (!$idNumber) {
+        $("#feedback").html("Please enter ID Number");
+        return
+    }
     $.ajax({
         url: url_host + 'total_time_today',
+        data: {"user_id": $idNumber},
         dataType: data_type_json,
         success: function(data) {
             $("#table").hide();
@@ -31,9 +100,15 @@ $( "#total-time-today" ).on("click", function() {
 
 
 $("#clockin").on("click", function() {
-   $.ajax({
-        url: url_host + 'in',
+    $idNumber = $("#user_id").val()
+    if (!$idNumber) {
+        $("#feedback").html("Please enter ID Number");
+        return
+    }
+    $.ajax({
+        url: 'in',
         dataType: data_type_json,
+        data: {"user_id": $idNumber},
         success: function(data) {
             console.log(data);
             if (data.processed == false) {
@@ -50,9 +125,15 @@ $("#clockin").on("click", function() {
 
 
 $("#clockout").on("click", function() {
-   $.ajax({
+    $idNumber = $("#user_id").val()
+    if (!$idNumber) {
+        $("#feedback").html("Please enter ID Number");
+        return
+    }
+    $.ajax({
         url: url_host + 'out',
         dataType: data_type_json,
+        data: {"user_id": $idNumber},
         success: function(data) {
             if (data.processed == false) {
                 $("#feedback").html("Not clocked in")
@@ -68,9 +149,14 @@ $("#clockout").on("click", function() {
 
 
 $("#total-time-this-week").on("click", function() {
-
+    $idNumber = $("#user_id").val()
+    if (!$idNumber) {
+        $("#feedback").html("Please enter ID Number");
+        return
+    }
     $.ajax({
         url: url_host + 'total_time_this_week',
+        data: {"user_id": $idNumber},
         dataType: data_type_json,
         success: function(data) {
             var res = data.response.msg;
@@ -111,16 +197,25 @@ $("#total-time-this-week").on("click", function() {
 });
 
 $( "#list-entries" ).bind( "click", function() {
+    $idNumber = $("#user_id").val()
+    if (!$idNumber) {
+        $("#feedback").html("Please enter ID Number");
+        return
+    }
     $.ajax({
         url: url_host + 'list_entries',
         dataType: data_type_json,
+        data: {"user_id": $idNumber},
         success: function(data) {
             if (data.processed == false){
+                console.log("it's false!!!");
+                $('#table').show();
+                $("#table").append("<tr><td>No entries for today yet.</td></tr>");
                 return
             }
             var res = data.response;
-            $('#table').show();
-            $('#edit-area').hide();
+            $("#table").show();
+            $("#edit-area").hide();
             myTable = $("#table");
 
             var entryRows = "<tr><th>in</th><th>out</th></tr>";
